@@ -35,7 +35,7 @@ cred = {'key': apikey}
 
 
 def getLoc():
-    drswDic={}
+    drswDict={}
     with open('masterfile_20160811.xml') as mfile:
         tree=ET.parse(mfile)
         root=tree.getroot()
@@ -43,17 +43,25 @@ def getLoc():
             serno=rec.find('serno')
             otherLoc=rec.find('othloc')
             if otherLoc is not None:
-                drswDic[serno.text] = otherLoc.text
-                print(drswDic)
+                drswDict[serno.text] = otherLoc.text
+    return drswDict
 
-
-
-
+def getOmekaItems():
+    getItems=requests.get(endpoint+'items?collection=2&page=1&per_page=18000')
+    records=json.loads(getItems.text)
+    
+    # for x in records:
+    #      first_subdiv_id = x['id']
+    #      for second in x['element_texts']:
+    #          second_subdiv_id = second['element']['id']
+    #          if second_subdiv_id == 251:
+    #              print(first_subdiv_id, second_subdiv_id)
 
 
 
 def main():
     getLoc()
+    getOmekaItems()
 
 
 if __name__ == '__main__':
