@@ -5,7 +5,7 @@ from jsonpatch import JsonPatch
 from re import match
 
 from xml.etree import ElementTree as ET
-
+# this script creates accessions from a csv
 
 endpoint = "http://quigon.library.arizona.edu/drsw/api/"
 apikey = ""
@@ -41,6 +41,10 @@ def getLoc():
             if otherLoc is not None:
                 drswDict[serno.text] = otherLoc.text
     return drswDict
+
+import csv, json
+import sys
+import requests
 
 
 def read_file_get_list_of_dicts(infile_path):
@@ -85,7 +89,11 @@ def main():
 
     # Specify our original fields
     original_fields = [
-        'Occupation','Biography','Bibliography','Source','Title','BID',''
+        'Occupation','Biography','Bibliography','Source','Title','BID','Language','Birth','Death',
+        'Marriage','Ethnicity','Occupation','UnFamily','Family','Baptism','Confirmation','Notes',
+        'See Also','Other','Second Marriage','Third Marriage','UnResidents','Residents','Author',
+        'Documentation','Misc Note','Precis','Serial Number','Persons','Places','Keywords','Ethnic Group',
+        'General Subject','Original Location','First Location','Other Location'
         ]
 
     # Get our original data structure
@@ -94,66 +102,10 @@ def main():
 
     # Manipulate that structure however we want, in this case I add another
     # column to everything called "brian_column" that has a random uuid in it
-    crossref_url = 'http://api.crossref.org/works/'
-
-    # Set a counter to print so we know how fast things are going
-    i = 0
-    m = len(rows)
 
     for row in rows:
 
-        # increment our counter
-        i += 1
-        # print the counter
-        print("{}/{}".format(str(i), str(m)))
-
-        DOI = row['DOI']
-        if len(DOI) > 0:
-            req = requests.get(crossref_url+DOI)
-
-            # if req.status_code == '404':pass
-            if req.status_code == requests.codes.ok:
-
-                req = req.json()
-
-                try:
-                    title = req['message']['title'][0]
-                except (KeyError, IndexError):
-                    title = ""
-
-                try:
-                    issn = req['message']['ISSN'][0]
-                except (KeyError, IndexError):
-                    issn = ""
-
-                try:
-                    journal_title = req['message']['container-title'][0]
-                except (KeyError, IndexError):
-                    journal_title = ""
-
-                try:
-                    authors =req['message']['author']
-                except KeyError:
-                    authors = []
-
-
-
-                # We need to do fancy stuff with author names
-                # Start an array we'll be filling with str entries
-                # formatted as "last, first"
-                auth_names = []
-
-                for author in authors:
-                    # Put both names in a list
-                    try:
-                        auth_name_list = [author['family'], author['given']]
-                    except KeyError:
-                        auth_name_list=[]
-                    # print(auth_name_list)
-                    # Throw a comma and a space in between them
-                    auth_name = ", ".join(auth_name_list)
-                    # Add them to our list of "last, first" strs
-                    auth_names.append(auth_name)
+        
 
 
                 # Take every entry in our list of "last, first" strs and jam them
