@@ -5,7 +5,7 @@ from jsonpatch import JsonPatch
 from re import match
 
 from xml.etree import ElementTree as ET
-# this script creates accessions from a csv
+
 
 endpoint = "http://quigon.library.arizona.edu/drsw/api/"
 apikey = ""
