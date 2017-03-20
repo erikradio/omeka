@@ -104,6 +104,7 @@ def main(drswDict):
 
     for row in rows:
         serno=row['Serial Number']
+        print(serno)
         if serno in drswDict:
             newOthLoc=drswDict.get(serno)
             row['New_Other_Location'] = newOthLoc
@@ -127,9 +128,9 @@ def main(drswDict):
     # make our field_names array reflect any changes in the data
 
     # copy our original the cheating-y way because strings are immutable
-    field_names = [x for x in original_fields]
+        field_names = [x for x in original_fields]
     # add the column we added to everything
-    field_names.append('New_Other_Location')
+        field_names.append('New_Other_Location')
 
 
     write_list_of_dicts_to_file(outfile_path, rows, field_names)
