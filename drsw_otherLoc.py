@@ -1,4 +1,5 @@
 import requests
+import sys
 import json
 import csv
 from jsonpatch import JsonPatch
@@ -42,9 +43,7 @@ def getLoc():
                 drswDict[serno.text] = otherLoc.text
     return drswDict
 
-import csv, json
-import sys
-import requests
+
 
 
 def read_file_get_list_of_dicts(infile_path):
@@ -82,7 +81,7 @@ def write_list_of_dicts_to_file(outfile_path, out_rows, field_names):
             writer.writerow(out_row)
 
 
-def main():
+def main(drswDict):
     # Grab our infile_path and outfile_path from the cli
     infile_path = sys.argv[1]
     outfile_path = sys.argv[2]
@@ -104,18 +103,22 @@ def main():
     # column to everything called "brian_column" that has a random uuid in it
 
     for row in rows:
+        serno=row['Serial Number']
+        if serno in drswDict:
+            newOthLoc=drswDict.get(serno)
+            row['New_Other_Location'] = newOthLoc
 
-        
+
 
 
                 # Take every entry in our list of "last, first" strs and jam them
                 # together into one big string separated by the double pipe
                 # characters.
 
-                row['Crossref_author'] = "||".join(auth_names)
-                row['Crossref_title'] = title
-                row['Crossref_issn'] = issn
-                row['Crossref_journal'] = journal_title
+                # row['Crossref_author'] = "||".join(auth_names)
+                # row['Crossref_title'] = title
+                # row['Crossref_issn'] = issn
+                # row['Crossref_journal'] = journal_title
 
     # Now we've finished manipulating our data structure, we want to write it
     # back into csv somewhere on disk. Keep in mind I added a column, so I
@@ -126,14 +129,13 @@ def main():
     # copy our original the cheating-y way because strings are immutable
     field_names = [x for x in original_fields]
     # add the column we added to everything
-    field_names.append('Crossref_author')
-    field_names.append('Crossref_title')
-    field_names.append('Crossref_journal')
-    field_names.append('Crossref_author')
-    field_names.append('Crossref_issn')
+    field_names.append('New_Other_Location')
+
 
     write_list_of_dicts_to_file(outfile_path, rows, field_names)
 
 # make this a safe-ish cli script
 if __name__ == '__main__':
-    main()
+
+
+    main(getLoc())
