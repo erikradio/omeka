@@ -30,6 +30,7 @@ with open(sys.argv[1], 'rU',errors='ignore') as csvfile:
         # inserts filename as local identifier
         identifier = SubElement(record, 'mods:identifier')
         identifier.set('type', 'local')
+        id=row['Identifier']
         identifier.text = row['Identifier']
 
 
@@ -47,8 +48,18 @@ with open(sys.argv[1], 'rU',errors='ignore') as csvfile:
         dateCreated.set('encoding','w3cdtf')
         dateCreated.text=row['DateCreated']
 
+        placeCreated = SubElement(originInfo,'mods:place')
+        placeCreated.set('supplied','yes')
+        placeTerm = SubElement(placeCreated,'mods:placeTerm')
+        placeTerm.set('authorityURI','http://id.worldcat.org/fast')
+        placeTerm.set('valueURI','http://id.worldcat.org/fast/1205454')
+        placeTerm.text = row['PlaceCreated']
+
         pub=SubElement(originInfo,'mods:publisher')
         pub.text = row['Publisher']
+
+        language = SubElement(record,'mods:language')
+        language.text = row['Language']
 
 
 
@@ -70,163 +81,42 @@ with open(sys.argv[1], 'rU',errors='ignore') as csvfile:
             y=x.split(';')
             namePart.text = y[0]
             roleTermtext.text = y[1]
-            
-
-
-
-
-
-
-
 
         # info about the nature of the resource. not from the spreadsheet
-        # physDesc=SubElement(record,'mods:physicalDescription')
-        # digOr=SubElement(physDesc,'mods:digitalOrigin')
-        # digOr.text='reformatted digital'
-        # form=SubElement(physDesc,'mods:form')
-        # form.set('type','material')
-        # form.set('authorityURI','http://vocab.getty.edu/aat')
-        # form.set('valueURI','http://vocab.getty.edu/aat/300041379')
-        # form.text='lithograph'
-        # interMed=SubElement(physDesc,'mods:internetMediaType')
-        # interMed.text='image/tiff'
+        physDesc = SubElement(record,'mods:physicalDescription')
+        digOr = SubElement(physDesc,'mods:digitalOrigin')
+        digOr.text = row['digitalOrigin']
+        form=SubElement(physDesc,'mods:form')
+        form.set('type','material')
+        form.text = row['Form']
+
+        interMed=SubElement(physDesc,'mods:internetMediaType')
+        interMed.text='audio/wav'
         #
-        # genre=SubElement(record,'mods:genre')
-        #
-        # genre.text='Ornithological illustration'
-        # accessCond=SubElement(record,'mods:accessCondition')
-        # accessCond.set('type','use and reproduction')
+        abstract = SubElement(record,'mods:abstract')
+        abstract.text = row['Abstract']
+
+        genre=SubElement(record,'mods:genre')
+        genre.set('authorityURI','http://id.loc.gov')
+        genre.set('valueURI','http://id.loc.gov/authorities/genreForms/gf2011026431.html')
+        genre.text='Oral histories'
+        accessCond=SubElement(record,'mods:accessCondition')
+        accessCond.set('type','use and reproduction')
         # accessCond.text='This work is in the public domain and is available for users to copy, use, and redistribute in part or in whole. No known restrictions apply to the work.'
         #
-        # # related item was used for the host parent of the plate, e.g. the monographic volume
-        # relatedItem=SubElement(record,'mods:relatedItem')
-        # relatedItem.set('type','host')
-        #
-        #
-        #
-        # relOrInfo=SubElement(relatedItem,'mods:originInfo')
-        # relOrInfo.set('eventType','publication')
-        # bookRow=row['Book']
-        #
-        # if bookRow in books:
-        #     relTitleInfo=SubElement(relatedItem,'mods:titleInfo')
-        #     relTitle=SubElement(relTitleInfo,'mods:title')
-        #     relTitle.text=books.get(bookRow)[0]
-        #     relPart=SubElement(relatedItem,'mods:part')
-        #     relDet=SubElement(relPart,'mods:detail')
-        #     relDet.set('type','volume')
-        #     relNum=SubElement(relDet,'mods:number')
-        #     relNum.text=row['Part']
-        #     if relNum.text=='S':
-        #         relNum.text='Supplement'
-        #     relLoc=SubElement(relatedItem,'mods:location')
-        #
-        #     relIdentifier=SubElement(relatedItem,'mods:identifier')
-        #     relIdentifier.set('type','oclc')
-        #     relIdentifier.text=books.get(bookRow)[5]
-        #     relLang=SubElement(relatedItem,'mods:language')
-        #     relLangCode=SubElement(relLang,'mods:languageTerm')
-        #     relLangCode.set('type','code')
-        #     relLangCode.set('authority','639-2')
-        #     relLangCode.text='eng'
-        #     relLangText=SubElement(relLang,'mods:languageTerm')
-        #     relLangText.set('type','text')
-        #     relLangText.text='English'
-        #     relGenre=SubElement(relatedItem,'mods:genre')
-        #     relGenre.text='Illustrated ornithological books'
-        #
-        #
-        #     pubs=books.get(bookRow)[3].split(';')
-        #     for x in pubs:
-        #         relPub=SubElement(relOrInfo,'mods:publisher')
-        #
-        #         relPub.text=x
-        #
-        #
-        #
-        #     # this wasn't in the spreadsheet, but I used London for the place of publication
-        #     relPlace=SubElement(relOrInfo,'mods:place')
-        #     relPlaceTerm=SubElement(relPlace,'mods:placeTerm')
-        #     relPlaceTerm.text=books.get(bookRow)[2]
-        #
-        #     relphysText=SubElement(relLoc,"mods:physicalLocation")
-        #     relphysText.set('type','text')
-        #     relphysText.text='University of Kansas. Kenneth Spencer Research Library'
-        #     relphysCode=SubElement(relLoc,'mods:physicalLocation')
-        #     relphysCode.set('authority','marcorg')
-        #     relphysCode.text='KFS'
-        #     relShelf=SubElement(relLoc,'mods:shelfLocator')
-        #     relShelf.text=books.get(bookRow)[4]
-        #
-        #     relEd=SubElement(relOrInfo,'mods:edition')
-        #     if '-' in books.get(bookRow)[1]:
-        #
-        #         relDateStart=SubElement(relOrInfo,'mods:dateIssued')
-        #         relDateStart.set('point','start')
-        #         relDateEnd=SubElement(relOrInfo,'mods:dateIssued')
-        #         relDateEnd.set('point','end')
-        #
-        #         relDateStart.text=books.get(bookRow)[1][0:4]
-        #         relDateEnd.text=books.get(bookRow)[1][5:10]
-        #     else:
-        #         relDate=SubElement(relOrInfo,'mods:dateIssued')
-        #         relDate.text=books.get(bookRow)[1]
-        #
-        #
-        # if row['Edition']=='1S':
-        #     relEd.text='1st'
-        # else:
-        #     relEd.text=row['Edition']
-        #
-        #
-        # # For supplements with same titles as host book or with second editions
-        #
-        # if relTitle.text=='Monograph of the Trogonidae, or family of trogons' and relEd.text=='2nd ed.':
-        #     relDate.text='1875'
-        # if relTitle.text=='Monograph of the Ramphastidae, or family of toucans' and row['Part']=='S':
-        #     relDate.text='1855'
-        #     relTitle.text='Supplement to the first edition of A monograph of the Ramphastidae, : or family of toucans'
-        #     relIdentifier.text='ocm05916002'
-        #     relShelf.text='Ellis Aves H17 item 2'
-        # if relTitle.text=='Monograph of the Ramphastidae, or family of toucans' and relEd.text=='2nd ed.':
-        #     relDate.text='1854'
-        #     relPub.text='Taylor and Francis'
-        #     relIdentifier.text='ocm11587418'
-        #     relShelf='Ellis Aves H126'
-        # if relTitle.text=='Monograph of the Trochilidae, or family of hummingbirds' and row['Edition']=='1S':
-        #     relSubTit=SubElement(relTitleInfo,'mods:subTitle')
-        #     relDate.text='1887'
-        #     relSubTit.text='Completed after the author\'s death by R. Bowdler Sharpe'
-        #     relPub.text='H. Sotheran &amp;   Co.'
-        # if relTitle.text=='Birds of Australia' and row['Edition']=='1S':
-        #     relTitle.text='The birds of Australia, supplement'
-        #     relIdentifier.text='ocm07568143'
-        #     relShelf.text='Ellis Aves H130'
-        #
-        #
-        #
-        #
-        #
-        #
-        #
-        # recordInfo=SubElement(record,'mods:recordInfo')
-        # recordConSo=SubElement(recordInfo,'mods:recordContentSource')
-        # recordConSo.set('authority','naf')
-        # recordConSo.set('authorityURI','http://id.loc.gov/authorities/names')
-        # recordConSo.set('valueURI','http://id.loc.gov/authorities/names/n82079265.html')
-        # recordConSo.text='University of Kansas'
-        # recordID=SubElement(recordInfo,'mods:recordIdentifier')
-        # recordID.text=row['BaseFileName']
-        # recordOrigin=SubElement(recordInfo,'mods:recordOrigin')
-        # recordOrigin.text='Records prepared through a combination of local MARC records and a local database for biological subjects.'
-        # recordCreDate=SubElement(recordInfo,'mods:recordCreationDate')
-        # recordCreDate.set('encoding','w3cdtf')
-        # recordCreDate.text=st
-        #
-        #
-        # # print tostring(root)
 
+        location = SubElement(record,'mods:location')
+        physLoc = SubElement(location,'mods:physicalLocation')
+        physLoc.set('authorityURI','http://id.worldcat.org/fast')
+        physLoc.set('valueURI','http://id.worldcat.org/fast/1567592')
+        shelfLocator = SubElement(location,'mods:shelfLocator')
+        shelfLocator.text = row['CallNumber'] +', '+row['ShelfLocator']
+        physLoc.text = 'University of Arizona. Library. Special Collections.'
+        typeOfResource = SubElement(record,'mods:typeOfResource')
+        typeOfResource.text = row['TypeOfResource']
+        # related item was used for the host parent of the plate, e.g. the monographic volume
+        relatedItem=SubElement(record,'mods:relatedItem')
+        relatedItem.set('type','host')
+        relatedItem.text = row['RelatedItem']
 
-
-
-tree.write('newBooks.xml',xml_declaration=True, encoding="UTF-8")
+    tree.write(id+'.xml',xml_declaration=True, encoding="UTF-8")
